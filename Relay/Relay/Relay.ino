@@ -1,5 +1,6 @@
 
 #include <ESP8266WiFi.h>
+#include <PubSubClient.h>
 #include <ArduinoOTA.h>
 
 //ESP----------------------------------------------------------------------------------------------------------------
@@ -13,6 +14,13 @@ bool wifiConnected = false;
 char ssid[40] = "Vodafone-Menegatti";//Vodafone-Menegatti
 char password[40] = "Menegatti13";//Menegatti13
 
+//MQTT----------------------------------------------------------------------------------------------------------------
+const char* mqtt_server = "localhost";
+const int port = 1883;
+
+WiFiClient espClient;
+PubSubClient client(espClient);
+
 //FUNCTIONS----------------------------------------------------------------------------------------------------------------
 
 //SETUP--------------------------------------------------------------------------------------------------------------------
@@ -25,8 +33,12 @@ void setup()
   Serial.print("Password: "); Serial.println(password);
   
 //try to connect Wi-Fi
-  if(WiFiSTA_Setup()) allSetup = true;
+  if(WiFiSTA_Setup())
+  {
+    allSetup = true;
+  }
   OTA_Setup("esp8266");
+  MQTT_Setup();
   
 // I/O
   inputPin = 16;//D0 default
@@ -35,7 +47,7 @@ void setup()
   pinMode(LED_BUILTIN, OUTPUT);
   pinMode(inputPin, INPUT);
   pinMode(outputPin, OUTPUT);
-
+  
   saveInputPinState = digitalRead(inputPin);
 }
 
@@ -63,5 +75,6 @@ void loop()
   }
 
   ArduinoOTA.handle();
+  client.loop();
   delay(1);
 }
