@@ -4,11 +4,17 @@
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 #include <ArduinoOTA.h>
+#include "DHTesp.h"
 
 //ESP----------------------------------------------------------------------------------------------------------------
 bool resetESP = false, allSetup = false, serverAP = false;
 double thisTime, lastTime;
 float temperature, humidity;
+
+//DHT----------------------------------------------------------------------------------------------------------------
+#define DHTPIN D4     // what digital pin the DHT22 is conected to
+
+DHTesp dht;
 
 //WI-FI----------------------------------------------------------------------------------------------------------------
 bool wifiConnected = false;
@@ -48,6 +54,7 @@ void setup()
   
 // I/O
   pinMode(LED_BUILTIN, OUTPUT);
+  dht.setup(DHTPIN, DHTesp::DHT22);
   
   lastTime = millis();
 }
@@ -56,11 +63,14 @@ void setup()
 void loop()
 {
 //verify mqtt broker connection
-  if (!client.connected()) reconnect();
+  //if (!client.connected()) reconnect();
 
   thisTime = millis();
   if(thisTime - lastTime > (REFRESH_MIN * 60 * 1000))
   {
+    humidity = dht.getHumidity();
+    temperature = dht.getTemperature();
+    
     String payload = "{\"temperature\":" +String(temperature)+ ",\"humidity\":" +String(humidity)+ "}";
     payload.toCharArray(msg, (payload.length() + 1));
     Serial.print("Publish message: ");
