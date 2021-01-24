@@ -15,15 +15,12 @@ void reconnect()
   if (client.connect(clientId.c_str())) 
   {
     Serial.println("connected");
-    client.subscribe("inTopic");
+    client.subscribe(sub_topic);
   } 
   else 
   {
     Serial.print("failed, rc=");
     Serial.print(client.state());
-    Serial.println(" try again in 5 seconds");
-    // Wait 5 seconds before retrying
-    delay(5000);
   }
 }
 
