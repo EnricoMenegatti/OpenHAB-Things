@@ -16,7 +16,10 @@ char password[40] = "Menegatti13";//Menegatti13
 
 //MQTT----------------------------------------------------------------------------------------------------------------
 const char* mqtt_server = "localhost";
+const char* sub_topic = "home/esp8266/relay_command";
+const char* pub_topic = "home/esp8266/relay_status";
 const int port = 1883;
+
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -53,7 +56,10 @@ void setup()
 
 //MAIN---------------------------------------------------------------------------------------------------------------------
 void loop()
-{ 
+{
+//verify mqtt broker connection
+  if (!client.connected()) reconnect();
+  
   if(saveInputPinState != digitalRead(inputPin)) //on toggle
   {
     if(saveOutputPinState == true) 
