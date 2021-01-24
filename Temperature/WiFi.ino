@@ -6,11 +6,8 @@ boolean WiFiSTA_Setup()
   
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
-  Serial.println("");
-  Serial.println("Connecting to WiFi");
+  Serial.print("Connecting to WiFi");
 
-  // Wait for connection
-  Serial.print("Connecting...");
   while (WiFi.status() != WL_CONNECTED) 
   {
     delay(500);

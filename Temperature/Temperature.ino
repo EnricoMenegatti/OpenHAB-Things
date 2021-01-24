@@ -1,5 +1,5 @@
 
-#define REFRESH_MIN 0.1
+#define REFRESH_MIN 10
 #define WIFI_CONN_TIME 30
 #define MQTT_CONN_TIME 30
 
@@ -39,6 +39,20 @@ PubSubClient client(espClient);
 
 //FUNCTIONS----------------------------------------------------------------------------------------------------------------
 
+void Publish()
+{
+  humidity = dht.getHumidity();
+  temperature = dht.getTemperature();
+  
+  String payload = "{\"temperature\":" +String(temperature)+ ",\"humidity\":" +String(humidity)+ "}";
+  payload.toCharArray(msg, (payload.length() + 1));
+  Serial.print("Publish message [");
+  Serial.print(pub_topic);
+  Serial.print("] ");
+  Serial.println(msg);
+  client.publish(pub_topic, msg);
+}
+
 //SETUP--------------------------------------------------------------------------------------------------------------------
 void setup()
 {
@@ -58,6 +72,7 @@ void setup()
   dht.setup(DHTPIN, DHTesp::DHT22);
   
   lastTime = millis();
+  Publish();
 }
 
 //MAIN---------------------------------------------------------------------------------------------------------------------
@@ -68,15 +83,7 @@ void loop()
   {
     if (mqttConnected)
     {
-      humidity = dht.getHumidity();
-      temperature = dht.getTemperature();
-      
-      String payload = "{\"temperature\":" +String(temperature)+ ",\"humidity\":" +String(humidity)+ "}";
-      payload.toCharArray(msg, (payload.length() + 1));
-      Serial.print("Publish message: ");
-      Serial.print(pub_topic);
-      Serial.println(msg);
-      client.publish(pub_topic, msg);
+      Publish();
     }
     else
     {
