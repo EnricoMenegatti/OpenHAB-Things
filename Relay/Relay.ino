@@ -1,4 +1,8 @@
 
+#define REFRESH_MIN 10
+#define WIFI_CONN_TIME 30
+#define MQTT_CONN_TIME 30
+
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 #include <ArduinoOTA.h>
@@ -15,11 +19,15 @@ char ssid[40] = "Vodafone-Menegatti";//Vodafone-Menegatti
 char password[40] = "Menegatti13";//Menegatti13
 
 //MQTT----------------------------------------------------------------------------------------------------------------
-const char* mqtt_server = "localhost";
-const char* sub_topic = "home/esp8266/relay_command";
-const char* pub_topic = "home/esp8266/relay_status";
-const int port = 1883;
+bool mqttConnected = false;
+const char* mqtt_server = "192.168.1.100";
+const int mqtt_port = 1883;
+const char* mqtt_user = "enrico";
+const char* mqtt_password = "Menegatti13";
 
+char sub_topic[100];
+char pub_topic[100];
+char msg[100];
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -31,17 +39,14 @@ void setup()
 {
   Serial.begin(115200);
   Serial.println("Setup...");
-
-  Serial.print("SSID: "); Serial.println(ssid);
-  Serial.print("Password: "); Serial.println(password);
   
 //try to connect Wi-Fi
-  if(WiFiSTA_Setup())
+  if (WiFiSTA_Setup())
   {
-    allSetup = true;
+    wifiConnected = true;
+    OTA_Setup("esp8266");
+    if (MQTT_Setup()) mqttConnected = true;
   }
-  OTA_Setup("esp8266");
-  MQTT_Setup();
   
 // I/O
   inputPin = 16;//D0 default
@@ -52,13 +57,24 @@ void setup()
   pinMode(outputPin, OUTPUT);
   
   saveInputPinState = digitalRead(inputPin);
+  lastTime = millis();
 }
 
 //MAIN---------------------------------------------------------------------------------------------------------------------
 void loop()
 {
-//verify mqtt broker connection
-  if (!client.connected()) reconnect();
+  thisTime = millis();
+  if (thisTime - lastTime > (REFRESH_MIN * 60 * 1000))
+  {
+    if (mqttConnected)
+    {
+    }
+    else
+    {
+      if (MQTT_Setup()) mqttConnected = true;
+    }
+      lastTime = millis();
+  }
   
   if(saveInputPinState != digitalRead(inputPin)) //on toggle
   {
@@ -78,6 +94,16 @@ void loop()
     saveInputPinState = digitalRead(inputPin);
     Serial.print("INPUT toggle to: "); Serial.println(saveInputPinState);
     Serial.print("OUTPUT toggle to: "); Serial.println(saveOutputPinState);
+  }
+
+  //se la connessione avviene a setup terminato riavvia
+  if (!wifiConnected)
+  {
+    if (WiFi.status() == WL_CONNECTED)
+    {
+      delay(1);
+      ESP.restart(); //ESP.reset();
+    }
   }
 
   ArduinoOTA.handle();
