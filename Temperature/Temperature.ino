@@ -1,5 +1,7 @@
 
 #define REFRESH_MIN 0.1
+#define WIFI_CONN_TIME 30
+#define MQTT_CONN_TIME 30
 
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
@@ -22,6 +24,7 @@ char ssid[40] = "Vodafone-Menegatti";//Vodafone-Menegatti
 char password[40] = "Menegatti13";//Menegatti13
 
 //MQTT----------------------------------------------------------------------------------------------------------------
+bool mqttConnected = false;
 const char* mqtt_server = "192.168.1.100";
 const int mqtt_port = 1883;
 const char* mqtt_user = "enrico";
@@ -29,9 +32,7 @@ const char* mqtt_password = "Menegatti13";
 
 char sub_topic[100];
 char pub_topic[100];
-
-#define MSG_BUFFER_SIZE 50
-char msg[MSG_BUFFER_SIZE];
+char msg[100];
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -43,17 +44,14 @@ void setup()
 {
   Serial.begin(115200);
   Serial.println("Setup...");
-
-  Serial.print("SSID: "); Serial.println(ssid);
-  Serial.print("Password: "); Serial.println(password);
   
 //try to connect Wi-Fi
-  if(WiFiSTA_Setup())
+  if (WiFiSTA_Setup())
   {
-    allSetup = true;
+    wifiConnected = true;
+    OTA_Setup("esp8266");
+    if (MQTT_Setup()) mqttConnected = true;
   }
-  OTA_Setup("esp8266");
-  MQTT_Setup();
   
 // I/O
   pinMode(LED_BUILTIN, OUTPUT);
@@ -65,23 +63,36 @@ void setup()
 //MAIN---------------------------------------------------------------------------------------------------------------------
 void loop()
 {
-//verify mqtt broker connection
-  //if (!client.connected()) reconnect();
-
   thisTime = millis();
-  if(thisTime - lastTime > (REFRESH_MIN * 60 * 1000))
+  if (thisTime - lastTime > (REFRESH_MIN * 60 * 1000))
   {
-    humidity = dht.getHumidity();
-    temperature = dht.getTemperature();
-    
-    String payload = "{\"temperature\":" +String(temperature)+ ",\"humidity\":" +String(humidity)+ "}";
-    payload.toCharArray(msg, (payload.length() + 1));
-    Serial.print("Publish message: ");
-    Serial.print(pub_topic);
-    Serial.println(msg);
-    client.publish(pub_topic, msg);
-    
-    lastTime = millis();
+    if (mqttConnected)
+    {
+      humidity = dht.getHumidity();
+      temperature = dht.getTemperature();
+      
+      String payload = "{\"temperature\":" +String(temperature)+ ",\"humidity\":" +String(humidity)+ "}";
+      payload.toCharArray(msg, (payload.length() + 1));
+      Serial.print("Publish message: ");
+      Serial.print(pub_topic);
+      Serial.println(msg);
+      client.publish(pub_topic, msg);
+    }
+    else
+    {
+      if (MQTT_Setup()) mqttConnected = true;
+    }
+      lastTime = millis();
+  }
+
+//se la connessione avviene a setup terminato riavvia
+  if (!wifiConnected)
+  {
+    if (WiFi.status() == WL_CONNECTED)
+    {
+      delay(1);
+      ESP.restart(); //ESP.reset();
+    }
   }
 
   ArduinoOTA.handle();

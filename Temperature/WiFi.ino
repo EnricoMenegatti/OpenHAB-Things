@@ -15,7 +15,7 @@ boolean WiFiSTA_Setup()
   {
     delay(500);
     Serial.print(".");
-    if (i > 30)
+    if (i > WIFI_CONN_TIME * 2)
     {
       state = false; 
       break;

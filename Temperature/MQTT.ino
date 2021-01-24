@@ -1,6 +1,9 @@
 
-void MQTT_Setup()
+boolean MQTT_Setup()
 {
+  boolean state = true;
+  int i = 0;
+  
   String sub_topic_1 = "home/esp8266/";
   String sub_topic_2 = WiFi.localIP().toString();
   String sub_topic_3 = "/command";
@@ -15,41 +18,33 @@ void MQTT_Setup()
 
   client.setServer(mqtt_server, mqtt_port);
   client.setCallback(MQTT_Callback);
-  
+
+  String clientId = "ESP8266Client-";
+  clientId += WiFi.localIP().toString();
+  Serial.println("Connecting to MQTT...");
+    
   while (!client.connected()) 
-  {
-    Serial.println("Connecting to MQTT...");
- 
-    if (client.connect("ESP8266Client", mqtt_user, mqtt_password)) 
+  {  
+    if (client.connect(clientId.c_str(), mqtt_user, mqtt_password)) 
     {
-      Serial.println("connected");  
+      Serial.println("connected");
+      client.subscribe(sub_topic);
     } 
     else 
     {
       Serial.print("failed with state ");
       Serial.print(client.state());
-      delay(2000);
+      
+      if (i > MQTT_CONN_TIME * 2)
+      {
+        state = false;
+        break;
+      }
+      i++;
+      delay(500);
     }
   }
-}
-
-void reconnect() 
-{
-  Serial.print("Attempting MQTT connection...");
-  // Create a random client ID
-  String clientId = "ESP8266Client-";
-  clientId += String(random(0xffff), HEX);
-  // Attempt to connect
-  if (client.connect(clientId.c_str(), "enrico", "Menegatti13")) 
-  {
-    Serial.println("connected");
-    client.subscribe(sub_topic);
-  } 
-  else 
-  {
-    Serial.print("failed, rc=");
-    Serial.print(client.state());
-  }
+  return state;
 }
 
 void MQTT_Callback(char* topic, byte* payload, unsigned int length) 
