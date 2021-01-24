@@ -22,10 +22,13 @@ char ssid[40] = "Vodafone-Menegatti";//Vodafone-Menegatti
 char password[40] = "Menegatti13";//Menegatti13
 
 //MQTT----------------------------------------------------------------------------------------------------------------
-const char* mqtt_server = "localhost";
-const char* sub_topic = "home/esp8266/temperature_req";
-const char* pub_topic = "home/esp8266/temperature";
-const int port = 1883;
+const char* mqtt_server = "192.168.1.100";
+const int mqtt_port = 1883;
+const char* mqtt_user = "enrico";
+const char* mqtt_password = "Menegatti13";
+
+char sub_topic[100];
+char pub_topic[100];
 
 #define MSG_BUFFER_SIZE 50
 char msg[MSG_BUFFER_SIZE];
@@ -74,6 +77,7 @@ void loop()
     String payload = "{\"temperature\":" +String(temperature)+ ",\"humidity\":" +String(humidity)+ "}";
     payload.toCharArray(msg, (payload.length() + 1));
     Serial.print("Publish message: ");
+    Serial.print(pub_topic);
     Serial.println(msg);
     client.publish(pub_topic, msg);
     
