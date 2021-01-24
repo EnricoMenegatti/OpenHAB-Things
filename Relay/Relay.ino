@@ -34,6 +34,17 @@ PubSubClient client(espClient);
 
 //FUNCTIONS----------------------------------------------------------------------------------------------------------------
 
+void Publish()
+{
+  String payload = "{\"input\":" +String(saveInputPinState)+ ",\"output\":" +String(saveOutputPinState)+ "}";
+  payload.toCharArray(msg, (payload.length() + 1));
+  Serial.print("Publish message [");
+  Serial.print(pub_topic);
+  Serial.print("] ");
+  Serial.println(msg);
+  client.publish(pub_topic, msg);
+}
+
 //SETUP--------------------------------------------------------------------------------------------------------------------
 void setup()
 {
@@ -78,22 +89,27 @@ void loop()
   
   if(saveInputPinState != digitalRead(inputPin)) //on toggle
   {
-    if(saveOutputPinState == true) 
+    delay(150);
+    if(saveInputPinState != digitalRead(inputPin)) //antirimbalzo
     {
-      digitalWrite(LED_BUILTIN, HIGH);
-      digitalWrite(outputPin, LOW);
-      saveOutputPinState = false;
+      if(saveOutputPinState == true) 
+      {
+        digitalWrite(LED_BUILTIN, HIGH);
+        digitalWrite(outputPin, LOW);
+        saveOutputPinState = false;
+      }
+      else
+      {        
+        digitalWrite(LED_BUILTIN, LOW);
+        digitalWrite(outputPin, HIGH);
+        saveOutputPinState = true;
+      }
+      
+      saveInputPinState = digitalRead(inputPin);
+      Serial.print("INPUT toggle to: "); Serial.println(saveInputPinState);
+      Serial.print("OUTPUT toggle to: "); Serial.println(saveOutputPinState);
+      Publish();
     }
-    else
-    {        
-      digitalWrite(LED_BUILTIN, LOW);
-      digitalWrite(outputPin, HIGH);
-      saveOutputPinState = true;
-    }
-    
-    saveInputPinState = digitalRead(inputPin);
-    Serial.print("INPUT toggle to: "); Serial.println(saveInputPinState);
-    Serial.print("OUTPUT toggle to: "); Serial.println(saveOutputPinState);
   }
 
   //se la connessione avviene a setup terminato riavvia

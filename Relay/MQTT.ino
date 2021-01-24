@@ -60,12 +60,24 @@ void MQTT_Callback(char* topic, byte* payload, unsigned int length)
   }
   Serial.println();
 
-  // Switch on the LED if an 1 was received as first character
-  if ((char)payload[0] == '1') {
-    digitalWrite(BUILTIN_LED, LOW);   // Turn the LED on (Note that LOW is the voltage level
-    // but actually the LED is on; this is because
-    // it is active low on the ESP-01)
-  } else {
-    digitalWrite(BUILTIN_LED, HIGH);  // Turn the LED off by making the voltage HIGH
+  if (String(payload_char) == "on")
+  {
+    Serial.println("ON");
+    digitalWrite(LED_BUILTIN, LOW);
+    digitalWrite(outputPin, HIGH);
+    saveOutputPinState = true;
+  }
+
+  else if (String(payload_char) == "off")
+  {
+    Serial.println("OFF");
+    digitalWrite(LED_BUILTIN, HIGH);
+    digitalWrite(outputPin, LOW);
+    saveOutputPinState = false;
+  }
+
+  else if (String(payload_char) == "refresh")
+  {
+    Publish();
   }
 }
