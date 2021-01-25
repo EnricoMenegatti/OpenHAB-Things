@@ -60,7 +60,23 @@ void MQTT_Callback(char* topic, byte* payload, unsigned int length)
   }
   Serial.println();
 
-  if (String(payload_char) == "refresh")
+  if (String(payload_char) == "on")
+  {
+    Serial.println("ON");
+    digitalWrite(LED_BUILTIN, LOW);
+    digitalWrite(outputPin, HIGH);
+    saveOutputPinState = true;
+  }
+
+  else if (String(payload_char) == "off")
+  {
+    Serial.println("OFF");
+    digitalWrite(LED_BUILTIN, HIGH);
+    digitalWrite(outputPin, LOW);
+    saveOutputPinState = false;
+  }
+
+  else if (String(payload_char) == "refresh")
   {
     Publish();
   }

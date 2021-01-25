@@ -10,6 +10,8 @@
 
 //ESP----------------------------------------------------------------------------------------------------------------
 bool resetESP = false, allSetup = false, serverAP = false;
+bool saveInputPinState, saveOutputPinState;
+int outputPin, inputPin;
 double thisTime, lastTime;
 float temperature, humidity;
 
@@ -44,7 +46,7 @@ void Publish()
   humidity = dht.getHumidity();
   temperature = dht.getTemperature();
   
-  String payload = "{\"temperature\":" +String(temperature)+ ",\"humidity\":" +String(humidity)+ "}";
+  String payload = "{\"temperature\":" +String(temperature)+ ",\"humidity\":" +String(humidity)+ ", \"input\":" +String(saveInputPinState)+ ",\"output\":" +String(saveOutputPinState)+ "}";
   payload.toCharArray(msg, (payload.length() + 1));
   Serial.print("Publish message [");
   Serial.print(pub_topic);
@@ -68,9 +70,15 @@ void setup()
   }
   
 // I/O
+  pinMode(inputPin, INPUT);
+  pinMode(outputPin, OUTPUT);
+
   pinMode(LED_BUILTIN, OUTPUT);
+  pinMode(inputPin, INPUT);
+  pinMode(outputPin, OUTPUT);
   dht.setup(DHTPIN, DHTesp::DHT22);
   
+  saveInputPinState = digitalRead(inputPin);
   lastTime = millis();
   Publish();
 }
@@ -90,6 +98,31 @@ void loop()
       if (MQTT_Setup()) mqttConnected = true;
     }
       lastTime = millis();
+  }
+
+  if(saveInputPinState != digitalRead(inputPin)) //on toggle
+  {
+    delay(150);
+    if(saveInputPinState != digitalRead(inputPin)) //antirimbalzo
+    {
+      if(saveOutputPinState == true) 
+      {
+        digitalWrite(LED_BUILTIN, HIGH);
+        digitalWrite(outputPin, LOW);
+        saveOutputPinState = false;
+      }
+      else
+      {        
+        digitalWrite(LED_BUILTIN, LOW);
+        digitalWrite(outputPin, HIGH);
+        saveOutputPinState = true;
+      }
+      
+      saveInputPinState = digitalRead(inputPin);
+      Serial.print("INPUT toggle to: "); Serial.println(saveInputPinState);
+      Serial.print("OUTPUT toggle to: "); Serial.println(saveOutputPinState);
+      Publish();
+    }
   }
 
 //se la connessione avviene a setup terminato riavvia
