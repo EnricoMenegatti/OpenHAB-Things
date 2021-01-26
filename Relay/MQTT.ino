@@ -80,4 +80,10 @@ void MQTT_Callback(char* topic, byte* payload, unsigned int length)
   {
     Publish();
   }
+
+  else if (String(payload_char) == "reboot")
+  {
+    delay(1);
+    ESP.restart();
+  }
 }

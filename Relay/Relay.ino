@@ -118,7 +118,7 @@ void loop()
     if (WiFi.status() == WL_CONNECTED)
     {
       delay(1);
-      ESP.restart(); //ESP.reset();
+      ESP.restart();
     }
   }
 
