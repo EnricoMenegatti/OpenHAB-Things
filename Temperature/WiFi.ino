@@ -31,3 +31,15 @@ boolean WiFiSTA_Setup()
   }
   return state;
 }
+
+void WiFiAP_Setup() 
+{
+  WiFi.softAPConfig(IP_AP, GTW_AP, mask_AP);
+  WiFi.softAP(ssid_AP, password_AP);
+
+  Serial.println();
+  Serial.print("AP SSID: ");
+  Serial.println(ssid_AP);
+  Serial.print("AP IP address: ");
+  Serial.println(WiFi.softAPIP());
+}

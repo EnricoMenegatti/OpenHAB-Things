@@ -5,23 +5,29 @@
 
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
+#include <FS.h>
 #include <ArduinoOTA.h>
 #include "DHTesp.h"
 
 //ESP----------------------------------------------------------------------------------------------------------------
 bool resetESP = false, allSetup = false, serverAP = false;
+int dhtPin;
 double thisTime, lastTime;
 float temperature, humidity;
 
 //DHT----------------------------------------------------------------------------------------------------------------
-#define DHTPIN D4     // what digital pin the DHT22 is conected to
-
 DHTesp dht;
 
 //WI-FI----------------------------------------------------------------------------------------------------------------
 bool wifiConnected = false;
 char ssid[40] = "Vodafone-Menegatti";//Vodafone-Menegatti
 char password[40] = "Menegatti13";//Menegatti13
+
+const char* ssid_AP = "ESP8266";
+const char* password_AP = "esp8266";
+IPAddress IP_AP(192,168,1,1);
+IPAddress mask_AP = (255, 255, 255, 0);
+IPAddress GTW_AP(192,168,1,1);
 
 //MQTT----------------------------------------------------------------------------------------------------------------
 bool mqttConnected = false;
@@ -59,17 +65,43 @@ void setup()
   Serial.begin(115200);
   Serial.println("Setup...");
   
+  SPIFFS_Setup();
+
+  readFile(SPIFFS, "/configSSID.txt").toCharArray(ssid, 40);
+  readFile(SPIFFS, "/configPassword.txt").toCharArray(password, 40);
+  if(String(ssid).length() <= 1 || String(password).length() <= 1) 
+  {
+    Serial.println("Error reading WiFi files!");
+  }
+
+  Serial.print("SSID: "); Serial.println(ssid);
+  Serial.print("Password: "); Serial.println(password);
+  
 //try to connect Wi-Fi
   if (WiFiSTA_Setup())
   {
+    Start_Server();
+
     wifiConnected = true;
     OTA_Setup("esp8266");
     if (MQTT_Setup()) mqttConnected = true;
   }
+  else //start AP Wi-Fi
+  {
+    WiFiAP_Setup();
+    Start_Server();
+    server.begin(); // start the HTTP server
+
+    serverAP = true;
+    lastTime = millis();
+  }
   
 // I/O
+  dhtPin = readFile(SPIFFS, "/configInput.txt").toInt();
+  if(dhtPin == 0) dhtPin = D4;//D4 default
+
   pinMode(LED_BUILTIN, OUTPUT);
-  dht.setup(DHTPIN, DHTesp::DHT22);
+  dht.setup(dhtPin, DHTesp::DHT22);
   
   lastTime = millis();
   Publish();
@@ -100,6 +132,12 @@ void loop()
       delay(1);
       ESP.restart();
     }
+  }
+
+  if(resetESP)
+  {
+    delay(1);
+    ESP.restart(); //ESP.reset();
   }
 
   ArduinoOTA.handle();

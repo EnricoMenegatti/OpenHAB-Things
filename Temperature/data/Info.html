@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>ESP-Alexa switch</title>
+        <link href="style.css" rel="stylesheet">
+    </head>
+    
+    <body onload="getStatus()">
+        <p id="status" style="display: none;">%OUTSTATUS%</p>
+        <a href="/SubmitOn" id="linkOn"></a>
+        <a href="/SubmitOff" id="linkOff"></a>
+        <center>
+            <H1>Configurazione ESP-Alexa switch</H1>
+            
+            <ul class="sidenav">
+                <li><a class="active" href="/Info.html">Info</a></li>
+                <li><a class="content" href="/WiFi.html">WiFi</a></li>
+                <li><a class="content" href="/Device.html">Dispositivo</a></li>
+                <li><a class="content" href="/Advanced.html">Avanzate</a></li>
+            </ul>
+            
+            <form class="form-1" id="InOut" method="post" action="/submit">
+                <H2>Comanda</H2>
+                <button type="button" class="on" id="on" style="display: none" onclick="linkOn()">ON</button>
+                <button type="button" class="off" id="off" style="display: none" onclick="linkOff()">OFF</button>
+            </form>
+            <div class="form-1">
+                <H2>Info</H2>
+                <table>
+                    <tr>
+                        <td class="first" ><p>Indirizzo IP:</p></td>
+                        <td class="second"><p>%IP%</p></td>
+                    </tr>
+                    <tr>
+                        <td class="first" ><p>Gateway:</p></td>
+                        <td class="second"><p>%GW%</p></td>
+                    </tr>
+                    <tr>
+                        <td class="first" ><p>Subnet mask:</p></td>
+                        <td class="second"><p>%SUB%</p></td>
+                    </tr>
+                    <tr>
+                        <td class="first" ><p>Indirizzo MAC:</p></td>
+                        <td class="second"><p>%MAC%</p></td>
+                    </tr>
+            </div>
+        </center>
+    </body>
+    <script>
+        function getStatus() 
+        {
+            var status = document.getElementById("status").innerHTML;
+
+            if(status == 1)
+            {
+                document.getElementById("on").style = "display: none";
+                document.getElementById("off").style = "display: block";
+            } 
+            else
+            {
+                document.getElementById("on").style = "display: block";
+                document.getElementById("off").style = "display: none";
+            }
+        }
+
+        function linkOn()
+        {
+            window.location=document.getElementById('linkOn').href;
+        }
+
+        function linkOff()
+        {
+            window.location=document.getElementById('linkOff').href;
+        }
+    </script>
+</html>

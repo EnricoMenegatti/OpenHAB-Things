@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>ESP-Alexa switch</title>
+        <link href="style.css" rel="stylesheet">
+    </head>
+    
+    <body>
+        <center>
+            <H1>Configurazione ESP-Alexa switch</H1>
+            
+            <ul class="sidenav">
+                <li><a class="content" href="/Info.html">Info</a></li>
+                <li><a class="active" href="/WiFi.html">WiFi</a></li>
+                <li><a class="content" href="/Device.html">Dispositivo</a></li>
+                <li><a class="content" href="/Advanced.html">Avanzate</a></li>
+            </ul>
+            
+            <form class="form-1" method="post" action="/submit">
+                <H2>Wi-Fi</H2>
+                <label for="ssid">SSID</label>
+                <input type="text" id="ssid" name="ssid" maxlength="40" value=%SSID%>
+                <br><br>
+                
+                <label for="pw">Password</label>
+                <input type="password" id="pw" name="pw" maxlength="40" value=%PASSWORD%>
+                
+                <input class="button" type="reset" value="Annulla">
+                <input class="button" type="submit" value="Salva">
+            </form>
+        </center>
+    </body>
+</html>
