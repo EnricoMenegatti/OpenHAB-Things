@@ -1,16 +1,13 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>ESP-Alexa switch</title>
+        <title>ESP-Smart Home</title>
         <link href="style.css" rel="stylesheet">
     </head>
     
-    <body onload="getStatus()">
-        <p id="status" style="display: none;">%OUTSTATUS%</p>
-        <a href="/SubmitOn" id="linkOn"></a>
-        <a href="/SubmitOff" id="linkOff"></a>
+    <body>
         <center>
-            <H1>Configurazione ESP-Alexa switch</H1>
+            <H1>Configurazione ESP-Smart Home Temperature</H1>
             
             <ul class="sidenav">
                 <li><a class="active" href="/Info.html">Info</a></li>
@@ -20,9 +17,8 @@
             </ul>
             
             <form class="form-1" id="InOut" method="post" action="/submit">
-                <H2>Comanda</H2>
-                <button type="button" class="on" id="on" style="display: none" onclick="linkOn()">ON</button>
-                <button type="button" class="off" id="off" style="display: none" onclick="linkOff()">OFF</button>
+                <H2>Temperatura</H2>
+                <p>%TEMPERATURE% °C</p>
             </form>
             <div class="form-1">
                 <H2>Info</H2>
@@ -46,31 +42,4 @@
             </div>
         </center>
     </body>
-    <script>
-        function getStatus() 
-        {
-            var status = document.getElementById("status").innerHTML;
-
-            if(status == 1)
-            {
-                document.getElementById("on").style = "display: none";
-                document.getElementById("off").style = "display: block";
-            } 
-            else
-            {
-                document.getElementById("on").style = "display: block";
-                document.getElementById("off").style = "display: none";
-            }
-        }
-
-        function linkOn()
-        {
-            window.location=document.getElementById('linkOn').href;
-        }
-
-        function linkOff()
-        {
-            window.location=document.getElementById('linkOff').href;
-        }
-    </script>
 </html>
