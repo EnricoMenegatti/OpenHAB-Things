@@ -17,10 +17,20 @@
             </ul>
             
             <form class="form-1" id="InOut" method="post" action="/submit">
-                <H2>Temperatura</H2>
-                <p>%TEMPERATURE% °C</p>
+                <table>
+                    <tr>
+                        <td class="fifty">
+                            <H2>Temperatura</H2>
+                            <p>%TEMPERATURE% °C</p>
+                        </td>
+                        <td class="fifty">
+                            <H2>Umidità</H2>
+                            <p>%HUMIDITY% %</p>
+                        </td>
+                    </tr>
+                </table>
             </form>
-            <div class="form-1">
+            <form class="form-1">
                 <H2>Info</H2>
                 <table>
                     <tr>
@@ -39,7 +49,8 @@
                         <td class="first" ><p>Indirizzo MAC:</p></td>
                         <td class="second"><p>%MAC%</p></td>
                     </tr>
-            </div>
+                </table>
+            </form>
         </center>
     </body>
 </html>

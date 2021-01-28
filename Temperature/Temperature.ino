@@ -22,14 +22,14 @@ DHTesp dht;
 
 //WI-FI----------------------------------------------------------------------------------------------------------------
 bool wifiConnected = false;
-char ssid[40] = "Vodafone-Menegatti";//Vodafone-Menegatti
-char password[40] = "Menegatti13";//Menegatti13
+char ssid[40] = "";//Vodafone-Menegatti
+char password[40] = "";//Menegatti13
 
 const char* ssid_AP = "ESP8266";
-const char* password_AP = "esp8266";
-IPAddress IP_AP(192,168,1,1);
+const char* password_AP = "";
+IPAddress IP_AP(192,168,4,1);
 IPAddress mask_AP = (255, 255, 255, 0);
-IPAddress GTW_AP(192,168,1,1);
+IPAddress GTW_AP(192,168,4,1);
 
 //WEBSERVER----------------------------------------------------------------------------------------------------------------
 AsyncWebServer server(80);
@@ -86,10 +86,34 @@ void setup()
   if (WiFiSTA_Setup())
   {
     Start_Server();
+    server.begin(); // start the HTTP server
 
     wifiConnected = true;
     OTA_Setup("esp8266");
     if (MQTT_Setup()) mqttConnected = true;
+    
+// DHT
+    readFile(SPIFFS, "/configSensor.txt").toCharArray(sensor_type, 40);
+    if (String(sensor_type) == "DHT11")
+    {
+      dhtPin = readFile(SPIFFS, "/configDHT_pin.txt").toInt();
+      if (dhtPin == 0) dhtPin = 4;//D2 default
+  
+      dht.setup(dhtPin, DHTesp::DHT11);
+    }
+    else if (String(sensor_type) == "DHT22")
+    {
+      dhtPin = readFile(SPIFFS, "/configDHT_pin.txt").toInt();
+      if (dhtPin == 0) dhtPin = 4;//D2 default
+  
+      dht.setup(dhtPin, DHTesp::DHT22);
+    }
+  
+// I/O
+    pinMode(LED_BUILTIN, OUTPUT);
+    
+    lastTime = millis();
+    Publish();
   }
   else //start AP Wi-Fi
   {
@@ -98,31 +122,8 @@ void setup()
     server.begin(); // start the HTTP server
 
     serverAP = true;
-    lastTime = millis();
   }
-  
-// DHT
-  readFile(SPIFFS, "/configSensor.txt").toCharArray(sensor_type, 40);
-  if (String(sensor_type) == "DHT11")
-  {
-    dhtPin = readFile(SPIFFS, "/configDHT_pin.txt").toInt();
-    if (dhtPin == 0) dhtPin = 4;//D2 default
-
-    dht.setup(dhtPin, DHTesp::DHT11);
-  }
-  else if (String(sensor_type) == "DHT22")
-  {
-    dhtPin = readFile(SPIFFS, "/configDHT_pin.txt").toInt();
-    if (dhtPin == 0) dhtPin = 4;//D2 default
-
-    dht.setup(dhtPin, DHTesp::DHT22);
-  }
-
-// I/O
-  pinMode(LED_BUILTIN, OUTPUT);
-  
   lastTime = millis();
-  Publish();
 }
 
 //MAIN---------------------------------------------------------------------------------------------------------------------

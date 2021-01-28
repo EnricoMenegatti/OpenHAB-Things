@@ -101,5 +101,7 @@ String processor(const String& var)
   else if (var == "PASSWORD") return String(password);
   else if (var == "SENSOR") return String(sensor_type);
   else if (var == "DHTPIN") return String(dhtPin);
+  else if (var == "TEMPERATURE") return String(temperature);
+  else if (var == "HUMIDITY") return String(humidity);
   return String();
 }

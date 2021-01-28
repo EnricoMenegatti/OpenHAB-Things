@@ -131,6 +131,12 @@ td.third{
   justify-content: center;
 }
 
+td.fifty{
+  text-align: center;
+  width: 50%;
+  justify-content: center;
+}
+
 p.adv{
   font-size: 14px;
   margin: 15px 0px 0px 0px;
