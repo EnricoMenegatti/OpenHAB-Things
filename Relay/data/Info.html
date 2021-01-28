@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>ESP-Smart Home</title>
+        <link href="style.css" rel="stylesheet">
+    </head>
+    
+    <body>
+        <center>
+            <H1>Configurazione ESP-Smart Home Temperature</H1>
+            
+            <ul class="sidenav">
+                <li><a class="active" href="/Info.html">Info</a></li>
+                <li><a class="content" href="/WiFi.html">WiFi</a></li>
+                <li><a class="content" href="/Device.html">Dispositivo</a></li>
+                <li><a class="content" href="/Advanced.html">Avanzate</a></li>
+            </ul>
+            
+            <form class="form-1" id="InOut" method="post" action="/submit">
+                <H2>Temperatura</H2>
+                <p>%TEMPERATURE% °C</p>
+            </form>
+            <div class="form-1">
+                <H2>Info</H2>
+                <table>
+                    <tr>
+                        <td class="first" ><p>Indirizzo IP:</p></td>
+                        <td class="second"><p>%IP%</p></td>
+                    </tr>
+                    <tr>
+                        <td class="first" ><p>Gateway:</p></td>
+                        <td class="second"><p>%GW%</p></td>
+                    </tr>
+                    <tr>
+                        <td class="first" ><p>Subnet mask:</p></td>
+                        <td class="second"><p>%SUB%</p></td>
+                    </tr>
+                    <tr>
+                        <td class="first" ><p>Indirizzo MAC:</p></td>
+                        <td class="second"><p>%MAC%</p></td>
+                    </tr>
+            </div>
+        </center>
+    </body>
+</html>

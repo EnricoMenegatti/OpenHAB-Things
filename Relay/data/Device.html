@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>ESP-Smart Home</title>
+        <link href="style.css" rel="stylesheet">
+    </head>
+    
+    <body onload="getSelect()">
+        <center>
+            <H1>Configurazione ESP-Smart Home Temperature</H1>
+            
+            <ul class="sidenav">
+                <li><a class="content" href="/Info.html">Info</a></li>
+                <li><a class="content" href="/WiFi.html">WiFi</a></li>
+                <li><a class="active" href="/Device.html">Dispositivo</a></li>
+                <li><a class="content" href="/Advanced.html">Avanzate</a></li>
+            </ul>
+            
+            <form class="form-1" id="InOut" method="post" action="/submit">
+                <H2>Sensore</H2>
+                <table style="border-spacing: 20px;">
+                    <tr>
+                        <td class="first" >
+                            <label for="sensor">DHT11</label>
+                        </td>
+                        <td class="second">
+                            <input type="radio" id="sensor" name="sensor" value="DHT11">
+                        </td>
+                        <td class="third" rowspan="2">                
+                            <select id="dht_pin" name="dht_pin">
+                              <option id="16" value="16">D0</option>
+                              <option id="5" value="5">D1</option>
+                              <option id="4" value="4">D2</option>
+                              <option id="14" value="14">D5</option>
+                              <option id="12" value="12">D6</option>
+                              <option id="13" value="13">D7</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="first" >
+                            <label for="sensor">DHT22</label>
+                        </td>
+                        <td class="second">
+                            <input type="radio" id="sensor" name="sensor" value="DHT22">
+                        </td>
+                    </tr>
+                </table>
+
+                <input class="button" type="reset" value="Annulla">
+                <input class="button" type="submit" value="Salva">
+            </form>
+        </center>
+    </body>
+</html>

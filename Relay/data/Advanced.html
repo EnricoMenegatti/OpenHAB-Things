@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>ESP-Smart Home</title>
+        <link href="style.css" rel="stylesheet">
+    </head>
+
+    <body onload="Startup()">
+        <a href="/SubmitReset" id="linkReset"></a>
+        <a href="/SubmitRipr" id="linkRipr"></a>
+        <center>
+            <H1>Configurazione ESP-Smart Home Temperature</H1>
+
+            <ul class="sidenav">
+                <li><a class="content" href="/Info.html">Info</a></li>
+                <li><a class="content" href="/WiFi.html">WiFi</a></li>
+                <li><a class="content" href="/Device.html">Dispositivo</a></li>
+                <li><a class="active" href="/Advanced.html">Avanzate</a></li>
+            </ul>
+
+            <div class="form-1">
+                <H2>Avanzate</H2>
+                <table>
+                    <tr>
+                        <td class="first" rowspan="2"><label>Reset</label></td>
+                        <td class="second"><p class="adv">Abilita</p></td>
+                        <td class="third" rowspan="2"><button type="button" id="reset" onclick="linkReset()">Reset</button></td>
+                    </tr>
+                    <tr>
+                        <td class="second"><input type="checkbox" id="checkReset" onclick="Reset()"></td>
+                    </tr>
+
+                    <tr>
+                        <td class="first" rowspan="2"><label>Ripristino dati di Fabbrica</label></td>
+                        <td class="second"><p class="adv">Abilita</p></td>
+                        <td class="third" rowspan="2"><button type="button" id="ripristino" onclick="linkRipr()">Ripristino</button></td>
+                    </tr>
+                    <tr>
+                        <td class="second"><input type="checkbox" id="checkRipr" onclick="Ripristino()"></td>
+                    </tr>
+                </table>
+            </div>
+        </center>
+    </body>
+    <script>
+        function Startup()
+        {
+            Reset();
+            Ripristino();
+        }
+
+        function Reset() 
+        {
+            var x = document.getElementById("checkReset").checked;
+            document.getElementById("reset").disabled = !x;
+        }
+
+        function Ripristino() 
+        {
+            var x = document.getElementById("checkRipr").checked;
+            document.getElementById("ripristino").disabled = !x;
+        }
+
+        function linkReset()
+        {
+            window.location=document.getElementById('linkReset').href;
+        }
+
+        function linkRipr()
+        {
+            window.location=document.getElementById('linkRipr').href;
+        }
+    </script>
+</html>
