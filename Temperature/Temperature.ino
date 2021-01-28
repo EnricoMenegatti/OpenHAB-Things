@@ -16,6 +16,7 @@ double thisTime, lastTime;
 float temperature, humidity;
 
 //DHT----------------------------------------------------------------------------------------------------------------
+char sensor_type[40];
 DHTesp dht;
 
 //WI-FI----------------------------------------------------------------------------------------------------------------
@@ -96,12 +97,18 @@ void setup()
     lastTime = millis();
   }
   
-// I/O
-  dhtPin = readFile(SPIFFS, "/configInput.txt").toInt();
-  if(dhtPin == 0) dhtPin = D4;//D4 default
+// DHT
+  readFile(SPIFFS, "/configSensor.txt").toCharArray(sensor_type, 40);
+  if (sensor_type = "DHT22" || sensor_type = "DHT11")
+  {
+    dhtPin = readFile(SPIFFS, "/configDHT_pin.txt").toInt();
+    if (dhtPin == 0) dhtPin = 4;//D2 default
 
+    dht.setup(dhtPin, sensor_type);
+  }
+
+// I/O
   pinMode(LED_BUILTIN, OUTPUT);
-  dht.setup(dhtPin, DHTesp::DHT22);
   
   lastTime = millis();
   Publish();
