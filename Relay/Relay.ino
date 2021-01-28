@@ -90,6 +90,8 @@ void setup()
   }
   
 // I/O
+  inputPin = readFile(SPIFFS, "/configInput.txt").toInt();
+  outputPin = readFile(SPIFFS, "/configOutput.txt").toInt();
   inputPin = 16;//D0 default
   outputPin = 5;//D1 default
 

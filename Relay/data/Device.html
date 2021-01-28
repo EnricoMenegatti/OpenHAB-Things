@@ -7,7 +7,7 @@
     
     <body onload="getSelect()">
         <center>
-            <H1>Configurazione ESP-Smart Home Temperature</H1>
+            <H1>Configurazione ESP-Smart Home Relay</H1>
             
             <ul class="sidenav">
                 <li><a class="content" href="/Info.html">Info</a></li>
@@ -17,17 +17,12 @@
             </ul>
             
             <form class="form-1" id="InOut" method="post" action="/submit">
-                <H2>Sensore</H2>
+                <H2>Input/Output PIN</H2>
                 <table style="border-spacing: 20px;">
                     <tr>
-                        <td class="first" >
-                            <label for="sensor">DHT11</label>
-                        </td>
-                        <td class="second">
-                            <input type="radio" id="sensor" name="sensor" value="DHT11">
-                        </td>
-                        <td class="third" rowspan="2">                
-                            <select id="dht_pin" name="dht_pin">
+                        <td class="first" ><label for="input">Input</label></td>
+                        <td class="second">                
+                            <select id="input" name="input">
                               <option id="16" value="16">D0</option>
                               <option id="5" value="5">D1</option>
                               <option id="4" value="4">D2</option>
@@ -37,19 +32,40 @@
                             </select>
                         </td>
                     </tr>
+
                     <tr>
-                        <td class="first" >
-                            <label for="sensor">DHT22</label>
-                        </td>
-                        <td class="second">
-                            <input type="radio" id="sensor" name="sensor" value="DHT22">
+                        <td class="first" ><label for="output">Output</label></td>
+                        <td class="second">                            
+                            <select id="output" name="output" form="InOut">
+                              <option id="36" value="16">D0</option>
+                              <option id="25" value="5">D1</option>
+                              <option id="24" value="4">D2</option>
+                              <option id="34" value="14">D5</option>
+                              <option id="32" value="12">D6</option>
+                              <option id="33" value="13">D7</option>
+                            </select>
                         </td>
                     </tr>
                 </table>
-
+                
                 <input class="button" type="reset" value="Annulla">
                 <input class="button" type="submit" value="Salva">
+
+                <p id="p_input" style="display: none;">%INPUT%</p>
+                <p id="p_output" style="display: none;">%OUTPUT%</p>
             </form>
         </center>
     </body>
+    <script>
+        function getSelect() 
+        {
+            var input_id = document.getElementById("p_input").innerHTML;
+            var output_id = Number(document.getElementById("p_output").innerHTML);
+
+            output_id += 20;
+
+            document.getElementById(input_id).selected = "true";
+            document.getElementById(output_id).selected = "true";
+        }
+    </script>
 </html>

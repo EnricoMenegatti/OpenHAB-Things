@@ -5,6 +5,22 @@ void Start_Server() // Start a HTTP server with a file read handler and an uploa
     request->send(SPIFFS, "/style.css", "text/css");
   });
 
+  server.on("/SubmitOn", [] (AsyncWebServerRequest *request) {
+    Serial.println("Submit ON");
+    
+    saveInputPinState = !saveInputPinState;
+    
+    request->redirect("/Info.html");
+  });
+
+  server.on("/SubmitOff", [] (AsyncWebServerRequest *request) {
+    Serial.println("Submit OFF");
+
+    saveInputPinState = !saveInputPinState;
+    
+    request->redirect("/Info.html");
+  });
+
   server.on("/SubmitRefresh", [] (AsyncWebServerRequest *request) {
     Serial.println("Submit Refresh");
     
@@ -47,16 +63,16 @@ void Start_Server() // Start a HTTP server with a file read handler and an uploa
         writeFile(SPIFFS, "/configPassword.txt", password);
       }
       
-      else if (p->name() == "sensor") 
+      else if(p->name() == "input") 
       {
-        request->arg("sensor").toCharArray(sensor_type, 40);
-        writeFile(SPIFFS, "/configSensor.txt", sensor_type);
+        inputPin = request->arg("input").toInt();
+        writeFile(SPIFFS, "/configInput.txt", String(inputPin).c_str());
       }
       
-      else if (p->name() == "dht_pin") 
+      else if(p->name() == "output") 
       {
-        dht22_pin = request->arg("dht_pin").toInt();
-        writeFile(SPIFFS, "/configDHT_pin.txt", String(dht22_pin).c_str());
+        outputPin = request->arg("output").toInt();
+        writeFile(SPIFFS, "/configOutput.txt", String(outputPin).c_str());
       }
       
       else 
@@ -105,7 +121,7 @@ String processor(const String& var)
   else if (var == "MAC") return String(WiFi.macAddress());
   else if (var == "SSID") return String(ssid);
   else if (var == "PASSWORD") return String(password);
-  else if (var == "SENSOR") return String(sensor_type);
-  else if (var == "INPUT") return String(inputPin);
+  else if(var == "INPUT") return String(inputPin);
+  else if(var == "OUTPUT") return String(outputPin);
   return String();
 }
