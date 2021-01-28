@@ -55,8 +55,8 @@ void Start_Server() // Start a HTTP server with a file read handler and an uploa
       
       else if (p->name() == "dht_pin") 
       {
-        dht22_pin = request->arg("dht_pin").toInt();
-        writeFile(SPIFFS, "/configDHT_pin.txt", String(dht22_pin).c_str());
+        dhtPin = request->arg("dht_pin").toInt();
+        writeFile(SPIFFS, "/configDHT_pin.txt", String(dhtPin).c_str());
       }
       
       else 
@@ -88,24 +88,18 @@ void Start_Server() // Start a HTTP server with a file read handler and an uploa
       request->send(SPIFFS, path, contentType, false, processor);
       Serial.println(String("\tSent file: ") + path);
     }
-    else if (!espalexa.handleAlexaApiCall(request)) //if you don't know the URI, ask espalexa whether it is an Alexa control request
-    {
-      //whatever you want to do with 404s
-      request->send(404, "text/plain", "Not found");
-    }
   });
 }
 
 String processor(const String& var)
 {
-  if (var == "OUTSTATUS") return String(saveOutputPinState);
-  else if (var == "IP") return WiFi.localIP().toString();
+  if (var == "IP") return WiFi.localIP().toString();
   else if (var == "GW") return WiFi.gatewayIP().toString();
   else if (var == "SUB") return WiFi.subnetMask().toString();
   else if (var == "MAC") return String(WiFi.macAddress());
   else if (var == "SSID") return String(ssid);
   else if (var == "PASSWORD") return String(password);
   else if (var == "SENSOR") return String(sensor_type);
-  else if (var == "INPUT") return String(inputPin);
+  else if (var == "DHTPIN") return String(dhtPin);
   return String();
 }

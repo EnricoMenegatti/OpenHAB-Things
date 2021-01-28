@@ -5,6 +5,7 @@
 
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
+#include <ESPAsyncWebServer.h>
 #include <FS.h>
 #include <ArduinoOTA.h>
 #include "DHTesp.h"
@@ -29,6 +30,9 @@ const char* password_AP = "esp8266";
 IPAddress IP_AP(192,168,1,1);
 IPAddress mask_AP = (255, 255, 255, 0);
 IPAddress GTW_AP(192,168,1,1);
+
+//WEBSERVER----------------------------------------------------------------------------------------------------------------
+AsyncWebServer server(80);
 
 //MQTT----------------------------------------------------------------------------------------------------------------
 bool mqttConnected = false;
@@ -99,12 +103,19 @@ void setup()
   
 // DHT
   readFile(SPIFFS, "/configSensor.txt").toCharArray(sensor_type, 40);
-  if (sensor_type = "DHT22" || sensor_type = "DHT11")
+  if (String(sensor_type) == "DHT11")
   {
     dhtPin = readFile(SPIFFS, "/configDHT_pin.txt").toInt();
     if (dhtPin == 0) dhtPin = 4;//D2 default
 
-    dht.setup(dhtPin, sensor_type);
+    dht.setup(dhtPin, DHTesp::DHT11);
+  }
+  else if (String(sensor_type) == "DHT22")
+  {
+    dhtPin = readFile(SPIFFS, "/configDHT_pin.txt").toInt();
+    if (dhtPin == 0) dhtPin = 4;//D2 default
+
+    dht.setup(dhtPin, DHTesp::DHT22);
   }
 
 // I/O

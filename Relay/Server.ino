@@ -104,11 +104,6 @@ void Start_Server() // Start a HTTP server with a file read handler and an uploa
       request->send(SPIFFS, path, contentType, false, processor);
       Serial.println(String("\tSent file: ") + path);
     }
-    else if (!espalexa.handleAlexaApiCall(request)) //if you don't know the URI, ask espalexa whether it is an Alexa control request
-    {
-      //whatever you want to do with 404s
-      request->send(404, "text/plain", "Not found");
-    }
   });
 }
 

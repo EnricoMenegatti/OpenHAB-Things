@@ -5,6 +5,7 @@
 
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
+#include <ESPAsyncWebServer.h>
 #include <FS.h>
 #include <ArduinoOTA.h>
 
@@ -24,6 +25,9 @@ const char* password_AP = "esp8266";
 IPAddress IP_AP(192,168,1,1);
 IPAddress mask_AP = (255, 255, 255, 0);
 IPAddress GTW_AP(192,168,1,1);
+
+//WEBSERVER----------------------------------------------------------------------------------------------------------------
+AsyncWebServer server(80);
 
 //MQTT----------------------------------------------------------------------------------------------------------------
 bool mqttConnected = false;
