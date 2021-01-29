@@ -50,6 +50,31 @@
                 <input class="button" type="reset" value="Annulla">
                 <input class="button" type="submit" value="Salva">
             </form>
+
+            <form class="form-1" id="InOut" method="post" action="/submit">
+                <H2>Offset</H2>
+                <table style="border-spacing: 20px;">
+                    <tr>
+                        <td class="first" >
+                            <label for="tempOffset">Temperatura [°C]</label>
+                        </td>
+                        <td class="second">
+                            <input type="number" id="tempOffset" name="tempOffset" value=%TEMP_OFFSET%>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="first" >
+                            <label for="humOffset">Umidità [%]</label>
+                        </td>
+                        <td class="second">
+                            <input type="number" id="humOffset" name="humOffset" value=%HUM_OFFSET%>
+                        </td>
+                    </tr>
+                </table>
+
+                <input class="button" type="reset" value="Annulla">
+                <input class="button" type="submit" value="Salva">
+            </form>
         </center>
     </body>
 </html>

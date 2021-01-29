@@ -58,7 +58,19 @@ void Start_Server() // Start a HTTP server with a file read handler and an uploa
         dhtPin = request->arg("dht_pin").toInt();
         writeFile(SPIFFS, "/configDHT_pin.txt", String(dhtPin).c_str());
       }
+
+      else if (p->name() == "dht_hum_offset") 
+      {
+        dhtHumOffset = request->arg("dht_hum_offset").toFloat();
+        writeFile(SPIFFS, "/configDHT_HumOffset.txt", String(dhtHumOffset).c_str());
+      }
       
+      else if (p->name() == "dht_temp_offset") 
+      {
+        dhtTempOffset = request->arg("dht_temp_offset").toFloat();
+        writeFile(SPIFFS, "/configDHT_TempOffset.txt", String(dhtTempOffset).c_str());
+      }
+
       else 
       {
         request->redirect("/Error.html");
@@ -103,5 +115,7 @@ String processor(const String& var)
   else if (var == "DHTPIN") return String(dhtPin);
   else if (var == "TEMPERATURE") return String(temperature);
   else if (var == "HUMIDITY") return String(humidity);
+  else if (var == "HUM_OFFSET") return String(dhtHumOffset);
+  else if (var == "TEMP_OFFSET") return String(dhtTempOffset);
   return String();
 }

@@ -18,6 +18,7 @@ float temperature, humidity;
 
 //DHT----------------------------------------------------------------------------------------------------------------
 char sensor_type[40];
+float dhtTempOffset, dhtHumOffset;
 DHTesp dht;
 
 //WI-FI----------------------------------------------------------------------------------------------------------------
@@ -52,8 +53,8 @@ PubSubClient client(espClient);
 
 void Publish()
 {
-  humidity = dht.getHumidity();
-  temperature = dht.getTemperature();
+  humidity = dht.getHumidity() + dhtHumOffset;
+  temperature = dht.getTemperature() + dhtTempOffset;
   
   String payload = "{\"temperature\":" +String(temperature)+ ",\"humidity\":" +String(humidity)+ "}";
   payload.toCharArray(msg, (payload.length() + 1));
@@ -74,7 +75,7 @@ void setup()
 
   readFile(SPIFFS, "/configSSID.txt").toCharArray(ssid, 40);
   readFile(SPIFFS, "/configPassword.txt").toCharArray(password, 40);
-  if(String(ssid).length() <= 1 || String(password).length() <= 1) 
+  if (String(ssid).length() <= 1 || String(password).length() <= 1) 
   {
     Serial.println("Error reading WiFi files!");
   }
@@ -93,6 +94,9 @@ void setup()
     if (MQTT_Setup()) mqttConnected = true;
     
 // DHT
+    dhtHumOffset = readFile(SPIFFS, "/configDHT_HumOffset.txt").toFloat();
+    dhtTempOffset = readFile(SPIFFS, "/configDHT_TempOffset.txt").toFloat();
+
     readFile(SPIFFS, "/configSensor.txt").toCharArray(sensor_type, 40);
     if (String(sensor_type) == "DHT11")
     {
@@ -123,37 +127,40 @@ void setup()
 
     serverAP = true;
   }
-  lastTime = millis();
 }
 
 //MAIN---------------------------------------------------------------------------------------------------------------------
 void loop()
 {
   thisTime = millis();
-  if (thisTime - lastTime > (REFRESH_MIN * 60 * 1000))
+  if (WiFi.status() == WL_CONNECTED)
   {
-    if (mqttConnected)
-    {
-      Publish();
-    }
-    else
-    {
-      if (MQTT_Setup()) mqttConnected = true;
-    }
-      lastTime = millis();
-  }
-
 //se la connessione avviene a setup terminato riavvia
-  if (!wifiConnected)
-  {
-    if (WiFi.status() == WL_CONNECTED)
+    if (!wifiConnected && serverAP)
     {
       delay(1);
       ESP.restart();
     }
+
+    if (thisTime - lastTime > (REFRESH_MIN * 60 * 1000))
+    {
+      if (mqttConnected)
+      {
+        Publish();
+      }
+      else
+      {
+        if (MQTT_Setup()) mqttConnected = true;
+      }
+    }
+    wifiConnected = true;
+  }
+  else
+  {
+    wifiConnected = false;
   }
 
-  if(resetESP)
+  if (resetESP)
   {
     delay(1);
     ESP.restart(); //ESP.reset();
