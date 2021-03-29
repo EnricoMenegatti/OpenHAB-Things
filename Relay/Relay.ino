@@ -17,14 +17,14 @@ double thisTime, lastTime;
 
 //WI-FI----------------------------------------------------------------------------------------------------------------
 bool wifiConnected = false;
-char ssid[40] = "Vodafone-Menegatti";//Vodafone-Menegatti
-char password[40] = "Menegatti13";//Menegatti13
+char ssid[40] = "";//Vodafone-Menegatti
+char password[40] = "";//Menegatti13
 
 const char* ssid_AP = "ESP8266";
-const char* password_AP = "esp8266";
-IPAddress IP_AP(192,168,1,1);
+const char* password_AP = "";
+IPAddress IP_AP(192,168,4,1);
 IPAddress mask_AP = (255, 255, 255, 0);
-IPAddress GTW_AP(192,168,1,1);
+IPAddress GTW_AP(192,168,4,1);
 
 //WEBSERVER----------------------------------------------------------------------------------------------------------------
 AsyncWebServer server(80);
@@ -78,10 +78,26 @@ void setup()
   if (WiFiSTA_Setup())
   {
     Start_Server();
+    server.begin(); // start the HTTP server
 
     wifiConnected = true;
     OTA_Setup("esp8266");
     if (MQTT_Setup()) mqttConnected = true;
+
+// I/O
+    inputPin = readFile(SPIFFS, "/configInput.txt").toInt();
+    if (inputPin == 0) inputPin = 16;//D0 default
+
+    outputPin = readFile(SPIFFS, "/configOutput.txt").toInt();
+    if (outputPin == 0) outputPin = 5;//D1 default
+
+    pinMode(LED_BUILTIN, OUTPUT);
+    pinMode(inputPin, INPUT);
+    pinMode(outputPin, OUTPUT);
+
+    saveInputPinState = digitalRead(inputPin);
+    lastTime = millis();
+    Publish();
   }
   else //start AP Wi-Fi
   {
@@ -90,37 +106,38 @@ void setup()
     server.begin(); // start the HTTP server
 
     serverAP = true;
-    lastTime = millis();
   }
-  
-// I/O
-  inputPin = readFile(SPIFFS, "/configInput.txt").toInt();
-  outputPin = readFile(SPIFFS, "/configOutput.txt").toInt();
-  inputPin = 16;//D0 default
-  outputPin = 5;//D1 default
-
-  pinMode(LED_BUILTIN, OUTPUT);
-  pinMode(inputPin, INPUT);
-  pinMode(outputPin, OUTPUT);
-  
-  saveInputPinState = digitalRead(inputPin);
-  lastTime = millis();
 }
 
 //MAIN---------------------------------------------------------------------------------------------------------------------
 void loop()
 {
   thisTime = millis();
-  if (thisTime - lastTime > (REFRESH_MIN * 60 * 1000))
+  if (WiFi.status() == WL_CONNECTED)
   {
-    if (mqttConnected)
+//se la connessione avviene a setup terminato riavvia
+    if (!wifiConnected && serverAP)
     {
+      delay(1);
+      ESP.restart();
     }
-    else
+
+    if (thisTime - lastTime > (REFRESH_MIN * 60 * 1000))
     {
-      if (MQTT_Setup()) mqttConnected = true;
+      if (mqttConnected)
+      {
+        Publish();
+      }
+      else
+      {
+        if (MQTT_Setup()) mqttConnected = true;
+      }
     }
-      lastTime = millis();
+    wifiConnected = true;
+  }
+  else
+  {
+    wifiConnected = false;
   }
   
   if(saveInputPinState != digitalRead(inputPin)) //on toggle
@@ -145,16 +162,6 @@ void loop()
       Serial.print("INPUT toggle to: "); Serial.println(saveInputPinState);
       Serial.print("OUTPUT toggle to: "); Serial.println(saveOutputPinState);
       Publish();
-    }
-  }
-
-  //se la connessione avviene a setup terminato riavvia
-  if (!wifiConnected)
-  {
-    if (WiFi.status() == WL_CONNECTED)
-    {
-      delay(1);
-      ESP.restart();
     }
   }
 
