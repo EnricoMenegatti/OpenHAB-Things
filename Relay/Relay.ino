@@ -91,7 +91,7 @@ void setup()
     outputPin = readFile(SPIFFS, "/configOutput.txt").toInt();
     if (outputPin == 0) outputPin = 5;//D1 default
 
-    pinMode(LED_BUILTIN, OUTPUT);
+    //pinMode(LED_BUILTIN, OUTPUT);
     pinMode(inputPin, INPUT);
     pinMode(outputPin, OUTPUT);
 
@@ -147,13 +147,13 @@ void loop()
     {
       if(saveOutputPinState == true) 
       {
-        digitalWrite(LED_BUILTIN, HIGH);
+        //digitalWrite(LED_BUILTIN, HIGH);
         digitalWrite(outputPin, LOW);
         saveOutputPinState = false;
       }
       else
       {        
-        digitalWrite(LED_BUILTIN, LOW);
+        //digitalWrite(LED_BUILTIN, LOW);
         digitalWrite(outputPin, HIGH);
         saveOutputPinState = true;
       }
